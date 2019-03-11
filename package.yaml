@@ -20,7 +20,7 @@ extra-source-files:
 description: Please see the README on GitHub at <https://github.com/githubuser/opennode-haskell#readme>
 
 dependencies:
-- base >= 4.7 && < 5
+- base >= 4.8 && < 5
 - req
 - bytestring
 - text
@@ -30,6 +30,8 @@ dependencies:
 - data-default-class
 - optparse-applicative
 - split
+- safe-money
+- symbol
 
 library:
   source-dirs: src

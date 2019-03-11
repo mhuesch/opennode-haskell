@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings     #-}
@@ -15,7 +16,9 @@ where
 import           Data.Aeson
 import           Data.Char
 import           Data.Maybe
+import           Data.Symbol
 import           GHC.Generics
+import           Money.Internal
 
 aesonOptions :: Options
 aesonOptions = defaultOptions { constructorTagModifier = map toLower }
@@ -194,19 +197,19 @@ instance ToJSON ChargeRequest where
     , "auto_settle" .= as
     ]
 
-data ChargeResponse =
+data ChargeResponse d =
   ChargeResponse {  id :: String
   , name               :: Maybe String
   , description        :: String
   , amount             :: Maybe Integer
   , status             :: Maybe ChargeState
   , createdAt          :: Maybe Integer
-  , fiatValue          :: Maybe Double
+  , fiatValue          :: Maybe (Dense d)
   , notes              :: Maybe String
   , callbackUrl        :: Maybe String
   , successUrl         :: Maybe String
   , orderId            :: Maybe String
-  , currency           :: Maybe String
+  , currency           :: Maybe d
   , sourceFiatValue    :: Maybe Double
   , autoSettle         :: Maybe Bool
   , chainInvoice       :: Maybe ChainInvoice
@@ -214,7 +217,7 @@ data ChargeResponse =
  } deriving (Show, Eq, Generic)
 
 
-instance ToJSON ChargeResponse where
+instance ToJSON d => ToJSON (ChargeResponse d) where
   toJSON (ChargeResponse ide na de am st ca fv no cu su oid cur sfv as ci li) = object
     [ "id" .= ide
     , "name" .= na
@@ -234,7 +237,7 @@ instance ToJSON ChargeResponse where
     , "lighting_invoice" .= li
     ]
 
-instance FromJSON ChargeResponse where
+instance FromJSON d => FromJSON (ChargeResponse d) where
   parseJSON = withObject "ChargeResponse" $ \v ->
     ChargeResponse
           <$> v .:  "id"
